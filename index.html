@@ -283,6 +283,16 @@
             }
         });
 
+        // Garante que a música toque após qualquer clique/touch do usuário
+        document.body.addEventListener('click', () => {
+            if (!gameStarted) startGame();
+            music.play().catch(() => {});
+        });
+        document.body.addEventListener('touchstart', () => {
+            if (!gameStarted) startGame();
+            music.play().catch(() => {});
+        });
+
         // --- INÍCIO ---
         let gameInterval = setInterval(main, gameSpeed);
 
