@@ -15,7 +15,7 @@
             --cor-grade: #ff00c1;
             --cor-cobra-1: #adff00;
             --cor-cobra-2: #00a878;
-            --cor-cobra-cabeca: #eaff7b; /* <-- Variável nova adicionada */
+            --cor-cobra-cabeca: #eaff7b;
             --cor-texto: #00f5d4;
             --cor-texto-sombra: #ff00c1;
             --tamanho-grid: 21; /* Usar número ímpar ajuda a centralizar */
@@ -49,7 +49,6 @@
             overflow: hidden;
         }
         
-        /* Efeito de Scanlines (tela antiga) */
         body::after {
             content: "";
             position: absolute;
@@ -76,7 +75,6 @@
             max-width: 600px;
             max-height: 600px;
             background-color: transparent;
-            /* Grade de neon feita com background-image */
             background-image: 
                 linear-gradient(to right, var(--cor-grade) 1px, transparent 1px),
                 linear-gradient(to bottom, var(--cor-grade) 1px, transparent 1px);
@@ -87,7 +85,6 @@
         }
 
         .snake {
-            /* Efeito de volume com gradiente radial */
             background: radial-gradient(circle at 60% 40%, var(--cor-cobra-1) 60%, var(--cor-cobra-2) 100%);
             box-shadow: 0 0 12px var(--cor-cobra-1), 0 0 2px var(--cor-cobra-2) inset;
             border-radius: 50%;
@@ -97,7 +94,6 @@
         }
 
         .snake-head {
-            /* MODIFICADO: Usa a nova variável --cor-cobra-cabeca */
             background: radial-gradient(circle at 60% 40%, var(--cor-cobra-cabeca) 70%, var(--cor-cobra-1) 100%);
             border-radius: 50%;
             box-shadow: 0 0 18px var(--cor-cobra-cabeca), 0 0 4px var(--cor-cobra-1) inset;
@@ -105,7 +101,6 @@
             z-index: 2;
         }
 
-        /* Olhos da cobra */
         .snake-head .eye {
             position: absolute;
             width: 18%;
@@ -126,8 +121,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: calc(50vmin / var(--tamanho-grid)); /* Tamanho da maçã responsivo */
-            filter: drop-shadow(0 0 3px #ff0000); /* Sombra para o emoji */
+            font-size: calc(50vmin / var(--tamanho-grid));
+            filter: drop-shadow(0 0 3px #ff0000);
             transform: scale(1.1);
         }
 
@@ -147,7 +142,6 @@
             font-size: 1.8rem;
         }
 
-        /* Estilos para os botões de toque */
         .touch-btn {
             background: var(--cor-grade);
             color: var(--cor-fundo-1);
@@ -195,27 +189,27 @@
 
     <script>
         // --- CONFIGURAÇÕES GERAIS ---
-        const GRID_SIZE = 21; // Mesmo valor do CSS
-        const STARTING_SPEED = 200; // Começa um pouco mais devagar
+        const GRID_SIZE = 21;
+        const STARTING_SPEED = 200;
         const gameBoard = document.getElementById('game-board');
         const scoreDisplay = document.getElementById('score');
         const music = document.getElementById('background-music');
         
-        let snake = [{ x: 11, y: 11 }]; // Posição inicial no centro
+        let snake = [{ x: 11, y: 11 }];
         let food = generateFood();
         let direction = { x: 0, y: 0 };
         let score = 0;
 
-        // MODIFICADO: Adicionada cor da cabeça na primeira posição
+        // ✅ MODIFICADO: A cor #ff00c1 foi trocada por #f72585 para não coincidir com a grade.
         const snakeColors = [
-            ["#eaff7b", "#adff00", "#00a878"], // verde limão (cabeça, corpo1, corpo2)
+            ["#eaff7b", "#adff00", "#00a878"], // verde limão
             ["#6dffef", "#00f5d4", "#1982c4"], // verde água
-            ["#ff79e7", "#ff00c1", "#6a4c93"], // rosa neon
+            ["#ff79e7", "#f72585", "#6a4c93"], // rosa neon (cor trocada aqui)
             ["#fff0a3", "#ffe066", "#ff595e"], // amarelo
             ["#6dffef", "#00a878", "#adff00"], // verde escuro
             ["#ffacaf", "#ff595e", "#ffe066"], // vermelho
             ["#80c9f1", "#1982c4", "#00f5d4"], // azul
-            ["#b399d3", "#6a4c93", "#ff00c1"]  // roxo
+            ["#b399d3", "#6a4c93", "#f72585"]  // roxo (cor trocada aqui também por consistência)
         ];
         let currentColorIndex = 0;
         let gameStarted = false;
@@ -223,7 +217,7 @@
 
         // --- LÓGICA DO JOGO ---
         function main() {
-            if (aiEnabled) aiMove(); // Chama IA se ativada
+            if (aiEnabled) aiMove();
             update();
             draw();
         }
@@ -236,7 +230,6 @@
                 score++;
                 scoreDisplay.innerText = score;
 
-                // MODIFICADO: Atualiza a cor da cabeça junto com o corpo
                 if (score % 10 === 0) {
                     currentColorIndex = (currentColorIndex + 1) % snakeColors.length;
                     document.documentElement.style.setProperty('--cor-cobra-cabeca', snakeColors[currentColorIndex][0]);
@@ -245,7 +238,7 @@
                 }
 
                 food = generateFood();
-                if (gameSpeed > 70) { // Aumenta a velocidade até um limite
+                if (gameSpeed > 70) {
                     gameSpeed -= 5;
                     clearInterval(gameInterval);
                     gameInterval = setInterval(main, gameSpeed);
@@ -268,7 +261,6 @@
                 snakeElement.style.gridRowStart = segment.y;
                 snakeElement.style.gridColumnStart = segment.x;
 
-                // Aplica cor e formato conforme animal selecionado
                 if (index === 0) {
                     snakeElement.classList.add('snake-head');
                     const leftEye = document.createElement('div');
@@ -280,11 +272,9 @@
                 } else {
                     snakeElement.classList.add('snake');
                 }
-
                 gameBoard.appendChild(snakeElement);
             });
 
-            // Comida
             const foodElement = document.createElement('div');
             foodElement.style.gridRowStart = food.y;
             foodElement.style.gridColumnStart = food.x;
@@ -333,7 +323,6 @@
             }
         });
 
-        // Garante que a música toque após qualquer clique/touch do usuário
         document.body.addEventListener('click', () => {
             if (!gameStarted) startGame();
             music.play().catch(() => {});
@@ -347,10 +336,6 @@
         let gameInterval = setInterval(main, gameSpeed);
 
         // --- CONTROLES DE TOQUE (MÓVEL) ---
-        const touchControls = document.getElementById('touch-controls');
-        const touchButtons = document.querySelectorAll('.touch-btn');
-
-        // Mostrar controles de toque se em um dispositivo móvel
         function isMobile() {
             return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|Mobile/i.test(navigator.userAgent);
         }
@@ -380,70 +365,36 @@
             aiButton.innerText = aiEnabled ? "Desativar IA" : "Ativar IA";
         });
 
-        // Função IA aprimorada: evita colisão com a cauda
+        // --- IA ---
         function aiMove() {
             const head = snake[0];
             const possibleMoves = [
-                { x: 0, y: -1, name: 'up' },
-                { x: 0, y: 1, name: 'down' },
-                { x: -1, y: 0, name: 'left' },
-                { x: 1, y: 0, name: 'right' }
+                { x: 0, y: -1, name: 'up' }, { x: 0, y: 1, name: 'down' },
+                { x: -1, y: 0, name: 'left' }, { x: 1, y: 0, name: 'right' }
             ];
 
-            // Ordena por distância até a comida
             possibleMoves.sort((a, b) => {
                 const distA = Math.abs((head.x + a.x) - food.x) + Math.abs((head.y + a.y) - food.y);
                 const distB = Math.abs((head.x + b.x) - food.x) + Math.abs((head.y + b.y) - food.y);
                 return distA - distB;
             });
 
-            // Simula cada movimento e escolhe o mais seguro
             for (const move of possibleMoves) {
-                // Evita reversão de direção
-                if ((move.x === -direction.x && move.y === -direction.y)) continue;
+                if (move.x === -direction.x && move.y === -direction.y) continue;
                 const nextPos = { x: head.x + move.x, y: head.y + move.y };
-
-                // Verifica se o próximo movimento é seguro
-                if (
-                    nextPos.x >= 1 && nextPos.x <= GRID_SIZE &&
-                    nextPos.y >= 1 && nextPos.y <= GRID_SIZE &&
-                    !snake.some(segment => segment.x === nextPos.x && segment.y === nextPos.y)
-                ) {
-                    // Simula o movimento: verifica se há pelo menos um movimento seguro depois deste
-                    let safeNext = false;
-                    for (const nextMove of possibleMoves) {
-                        if ((nextMove.x === -move.x && nextMove.y === -move.y)) continue;
-                        const futurePos = { x: nextPos.x + nextMove.x, y: nextPos.y + nextMove.y };
-                        if (
-                            futurePos.x >= 1 && futurePos.x <= GRID_SIZE &&
-                            futurePos.y >= 1 && futurePos.y <= GRID_SIZE &&
-                            !snake.some(segment => segment.x === futurePos.x && segment.y === futurePos.y) &&
-                            !(futurePos.x === head.x && futurePos.y === head.y) // não volta pra cabeça
-                        ) {
-                            safeNext = true;
-                            break;
-                        }
-                    }
-                    if (safeNext) {
-                        direction = { x: move.x, y: move.y };
-                        return;
-                    }
-                }
-            }
-
-            // Se não encontrou movimento seguro, faz o primeiro possível (evita travar)
-            for (const move of possibleMoves) {
-                if ((move.x === -direction.x && move.y === -direction.y)) continue;
-                const nextPos = { x: head.x + move.x, y: head.y + move.y };
-                if (
-                    nextPos.x >= 1 && nextPos.x <= GRID_SIZE &&
-                    nextPos.y >= 1 && nextPos.y <= GRID_SIZE &&
-                    !snake.some(segment => segment.x === nextPos.x && segment.y === nextPos.y)
-                ) {
+                if (!isCollision(nextPos, snake)) {
                     direction = { x: move.x, y: move.y };
                     return;
                 }
             }
+        }
+        
+        // Função auxiliar para IA verificar colisão futura
+        function isCollision(pos, snakeBody) {
+            if (pos.x < 1 || pos.x > GRID_SIZE || pos.y < 1 || pos.y > GRID_SIZE) {
+                return true;
+            }
+            return snakeBody.some(segment => segment.x === pos.x && segment.y === pos.y);
         }
     </script>
 </body>
