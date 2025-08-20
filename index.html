@@ -15,6 +15,7 @@
             --cor-grade: #ff00c1;
             --cor-cobra-1: #adff00;
             --cor-cobra-2: #00a878;
+            --cor-cobra-cabeca: #eaff7b; /* <-- Variável nova adicionada */
             --cor-texto: #00f5d4;
             --cor-texto-sombra: #ff00c1;
             --tamanho-grid: 21; /* Usar número ímpar ajuda a centralizar */
@@ -96,9 +97,10 @@
         }
 
         .snake-head {
-            background: radial-gradient(circle at 60% 40%, #eaff7b 70%, var(--cor-cobra-1) 100%);
+            /* MODIFICADO: Usa a nova variável --cor-cobra-cabeca */
+            background: radial-gradient(circle at 60% 40%, var(--cor-cobra-cabeca) 70%, var(--cor-cobra-1) 100%);
             border-radius: 50%;
-            box-shadow: 0 0 18px #eaff7b, 0 0 4px var(--cor-cobra-1) inset;
+            box-shadow: 0 0 18px var(--cor-cobra-cabeca), 0 0 4px var(--cor-cobra-1) inset;
             position: relative;
             z-index: 2;
         }
@@ -172,7 +174,6 @@
         <div class="score-container">SCORE: <span id="score">0</span></div>
     </div>
 
-    <!-- Controles de toque para celular -->
     <div id="touch-controls" style="display: none;">
         <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
             <button class="touch-btn" data-dir="up">▲</button>
@@ -205,16 +206,16 @@
         let direction = { x: 0, y: 0 };
         let score = 0;
 
-        // Cores para troca automática
+        // MODIFICADO: Adicionada cor da cabeça na primeira posição
         const snakeColors = [
-            ["#adff00", "#00a878"], // verde limão + verde escuro
-            ["#00f5d4", "#1982c4"], // verde água + azul
-            ["#ff00c1", "#6a4c93"], // rosa neon + roxo
-            ["#ffe066", "#ff595e"], // amarelo + vermelho
-            ["#00a878", "#adff00"], // verde escuro + verde limão
-            ["#ff595e", "#ffe066"], // vermelho + amarelo
-            ["#1982c4", "#00f5d4"], // azul + verde água
-            ["#6a4c93", "#ff00c1"]  // roxo + rosa neon
+            ["#eaff7b", "#adff00", "#00a878"], // verde limão (cabeça, corpo1, corpo2)
+            ["#6dffef", "#00f5d4", "#1982c4"], // verde água
+            ["#ff79e7", "#ff00c1", "#6a4c93"], // rosa neon
+            ["#fff0a3", "#ffe066", "#ff595e"], // amarelo
+            ["#6dffef", "#00a878", "#adff00"], // verde escuro
+            ["#ffacaf", "#ff595e", "#ffe066"], // vermelho
+            ["#80c9f1", "#1982c4", "#00f5d4"], // azul
+            ["#b399d3", "#6a4c93", "#ff00c1"]  // roxo
         ];
         let currentColorIndex = 0;
         let gameStarted = false;
@@ -235,11 +236,12 @@
                 score++;
                 scoreDisplay.innerText = score;
 
-                // Troca de cor a cada 10 pontos
+                // MODIFICADO: Atualiza a cor da cabeça junto com o corpo
                 if (score % 10 === 0) {
                     currentColorIndex = (currentColorIndex + 1) % snakeColors.length;
-                    document.documentElement.style.setProperty('--cor-cobra-1', snakeColors[currentColorIndex][0]);
-                    document.documentElement.style.setProperty('--cor-cobra-2', snakeColors[currentColorIndex][1]);
+                    document.documentElement.style.setProperty('--cor-cobra-cabeca', snakeColors[currentColorIndex][0]);
+                    document.documentElement.style.setProperty('--cor-cobra-1', snakeColors[currentColorIndex][1]);
+                    document.documentElement.style.setProperty('--cor-cobra-2', snakeColors[currentColorIndex][2]);
                 }
 
                 food = generateFood();
