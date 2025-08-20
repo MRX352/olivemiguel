@@ -86,16 +86,39 @@
         }
 
         .snake {
-            /* Textura de "escamas" com gradiente */
-            background-color: var(--cor-cobra-2);
-            background-image: repeating-linear-gradient(45deg, var(--cor-cobra-1) 0, var(--cor-cobra-1) 1px, var(--cor-cobra-2) 1px, var(--cor-cobra-2) 3px);
-            box-shadow: 0 0 8px var(--cor-cobra-1);
-            border-radius: 2px;
+            /* Efeito de volume com gradiente radial */
+            background: radial-gradient(circle at 60% 40%, #adff00 60%, #00a878 100%);
+            box-shadow: 0 0 12px #adff00, 0 0 2px #00a878 inset;
+            border-radius: 50%;
+            position: relative;
+            z-index: 1;
+            transition: box-shadow 0.2s;
         }
 
         .snake-head {
-            background: var(--cor-cobra-1); /* Cabeça com cor sólida para destaque */
+            background: radial-gradient(circle at 60% 40%, #eaff7b 70%, #adff00 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 18px #eaff7b, 0 0 4px #adff00 inset;
+            position: relative;
             z-index: 2;
+        }
+
+        /* Olhos da cobra */
+        .snake-head .eye {
+            position: absolute;
+            width: 18%;
+            height: 18%;
+            background: #222;
+            border-radius: 50%;
+            top: 30%;
+            left: 20%;
+            box-shadow: 1.5em 0 0 0 #222;
+            z-index: 3;
+        }
+
+        .snake-head .eye.right {
+            left: auto;
+            right: 20%;
         }
 
         .food {
@@ -229,7 +252,16 @@
                 snakeElement.style.gridRowStart = segment.y;
                 snakeElement.style.gridColumnStart = segment.x;
                 snakeElement.classList.add('snake');
-                if (index === 0) snakeElement.classList.add('snake-head');
+                if (index === 0) {
+                    snakeElement.classList.add('snake-head');
+                    // Adiciona olhos
+                    const leftEye = document.createElement('div');
+                    leftEye.classList.add('eye');
+                    const rightEye = document.createElement('div');
+                    rightEye.classList.add('eye', 'right');
+                    snakeElement.appendChild(leftEye);
+                    snakeElement.appendChild(rightEye);
+                }
                 gameBoard.appendChild(snakeElement);
             });
 
