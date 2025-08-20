@@ -301,8 +301,8 @@
                 html = `
                     <div style="position:relative;width:100px;height:100px;">
                         <div style="position:absolute;left:30px;top:40px;width:40px;height:40px;background:${color};border-radius:50%;box-shadow:0 0 12px ${color};"></div>
-                        <div style="position:absolute;left:45px;top:55px;width:10px;height:10px;background:#222;border-radius:50%;"></div>
-                        <div style="position:absolute;left:65px;top:55px;width:10px;height:10px;background:#222;border-radius:50%;"></div>
+                        <div style="position:absolute;left:45px;top=55px;width:10px;height:10px;background:#222;border-radius:50%;"></div>
+                        <div style="position:absolute;left:65px;top=55px;width:10px;height:10px;background:#222;border-radius:50%;"></div>
                         <div style="position:absolute;left:50px;top:80px;width:2px;height:18px;background:#e22;border-radius:2px;"></div>
                     </div>
                 `;
@@ -401,7 +401,7 @@
                 snakeElement.style.gridRowStart = segment.y;
                 snakeElement.style.gridColumnStart = segment.x;
 
-                // Animal customizado
+                // Aplica cor e formato conforme animal selecionado
                 if (window.selectedAnimal === 'worm') {
                     snakeElement.style.background = selectedColor;
                     snakeElement.style.borderRadius = '20px';
@@ -414,13 +414,21 @@
                     snakeElement.style.background = selectedColor;
                     snakeElement.style.borderRadius = '50%';
                     snakeElement.style.boxShadow = `0 0 8px ${selectedColor}`;
-                } else {
-                    snakeElement.classList.add('snake');
+                } else if (window.selectedAnimal === 'snake') {
+                    // Cobra padrão: gradiente e sombra
+                    if (index === 0) {
+                        snakeElement.classList.add('snake-head');
+                        snakeElement.style.background = `radial-gradient(circle at 60% 40%, ${selectedColor} 70%, ${selectedColor} 100%)`;
+                        snakeElement.style.boxShadow = `0 0 18px ${selectedColor}, 0 0 4px ${selectedColor} inset`;
+                    } else {
+                        snakeElement.classList.add('snake');
+                        snakeElement.style.background = `radial-gradient(circle at 60% 40%, ${selectedColor} 60%, #00a878 100%)`;
+                        snakeElement.style.boxShadow = `0 0 12px ${selectedColor}, 0 0 2px #00a878 inset`;
+                    }
                 }
 
+                // Cabeça: olhos e boca realistas
                 if (index === 0) {
-                    snakeElement.classList.add('snake-head');
-                    // Olhos e boca realistas
                     if (window.selectedAnimal === 'frog') {
                         const leftEye = document.createElement('div');
                         leftEye.style.position = 'absolute';
@@ -440,7 +448,6 @@
                         rightEye.style.top = '30%';
                         rightEye.style.right = '10%';
                         snakeElement.appendChild(rightEye);
-                        // Boca
                         const mouth = document.createElement('div');
                         mouth.style.position = 'absolute';
                         mouth.style.width = '40%';
@@ -479,8 +486,8 @@
                         eye.style.top = '40%';
                         eye.style.left = '42%';
                         snakeElement.appendChild(eye);
-                    } else {
-                        // Cobra padrão
+                    } else if (window.selectedAnimal === 'snake') {
+                        // Cobra padrão: olhos
                         const leftEye = document.createElement('div');
                         leftEye.classList.add('eye');
                         const rightEye = document.createElement('div');
