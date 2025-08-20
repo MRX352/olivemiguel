@@ -164,6 +164,57 @@
             background: var(--cor-cobra-1);
             color: var(--cor-fundo-2);
         }
+
+        /* Estilos do menu de personalização */
+        #custom-menu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(13, 2, 33, 0.98);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #custom-menu h2 {
+            color: var(--cor-texto);
+            text-shadow: 0 0 8px var(--cor-grade);
+            margin-bottom: 18px;
+        }
+
+        #animal-select, #color-picker {
+            font-size: 1.1rem;
+            padding: 6px 12px;
+            border-radius: 6px;
+            margin-right: 10px;
+        }
+
+        #animal-preview {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid var(--cor-grade);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        #start-btn {
+            font-size: 1.3rem;
+            background: var(--cor-grade);
+            color: var(--cor-fundo-1);
+            border-radius: 8px;
+            border: none;
+            padding: 12px 28px;
+            cursor: pointer;
+            box-shadow: 0 0 8px var(--cor-grade);
+        }
     </style>
 </head>
 <body>
@@ -187,6 +238,31 @@
     <div id="game-board"></div>
     
     <button id="toggle-ai" style="margin-bottom: 15px; font-size: 1.2rem; background: var(--cor-grade); color: var(--cor-fundo-1); border-radius: 8px; border: none; padding: 10px 18px; cursor: pointer; box-shadow: 0 0 8px var(--cor-grade);">Ativar IA</button>
+
+    <!-- Menu de Personalização -->
+    <div id="custom-menu" style="position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(13,2,33,0.98); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <h2 style="color: var(--cor-texto); text-shadow: 0 0 8px var(--cor-grade); margin-bottom: 18px;">Personalize seu Animal</h2>
+        <div style="display: flex; gap: 32px; margin-bottom: 24px;">
+            <!-- Escolha de Animal -->
+            <div>
+                <label style="color: var(--cor-texto); font-size: 1.2rem;">Animal:</label>
+                <select id="animal-select" style="font-size: 1.1rem; padding: 6px 12px; border-radius: 6px;">
+                    <option value="snake">Cobra</option>
+                    <option value="worm">Minhoca</option>
+                    <option value="lizard">Lagarto</option>
+                    <option value="frog">Sapo</option>
+                </select>
+            </div>
+            <!-- Escolha de Cor -->
+            <div>
+                <label style="color: var(--cor-texto); font-size: 1.2rem;">Cor:</label>
+                <input type="color" id="color-picker" value="#adff00" style="width: 48px; height: 32px; border: none; border-radius: 6px;">
+            </div>
+        </div>
+        <!-- Preview do Animal -->
+        <div id="animal-preview" style="width: 120px; height: 120px; margin-bottom: 24px;"></div>
+        <button id="start-btn" style="font-size: 1.3rem; background: var(--cor-grade); color: var(--cor-fundo-1); border-radius: 8px; border: none; padding: 12px 28px; cursor: pointer; box-shadow: 0 0 8px var(--cor-grade);">Iniciar Jogo</button>
+    </div>
 
     <audio id="background-music" loop>
         <source src="https://cdn.pixabay.com/download/audio/2023/01/18/audio_623812d116.mp3" type="audio/mpeg">
@@ -243,33 +319,180 @@
             }
         }
 
+        // Personalização do animal
+        const customMenu = document.getElementById('custom-menu');
+        const startBtn = document.getElementById('start-btn');
+        const animalSelect = document.getElementById('animal-select');
+        const colorPicker = document.getElementById('color-picker');
+        const animalPreview = document.getElementById('animal-preview');
+
+        let selectedAnimal = 'snake';
+        let selectedColor = '#adff00';
+
+        // Modelos realistas em SVG/CSS
+        function renderAnimalPreview(animal, color) {
+            let html = '';
+            if (animal === 'snake') {
+                html = `
+                    <div style="position:relative;width:100px;height:100px;">
+                        <div style="position:absolute;left:30px;top:40px;width:40px;height:40px;background:${color};border-radius:50%;box-shadow:0 0 12px ${color};"></div>
+                        <div style="position:absolute;left:45px;top=55px;width:10px;height:10px;background:#222;border-radius:50%;"></div>
+                        <div style="position:absolute;left:65px;top=55px;width:10px;height:10px;background:#222;border-radius:50%;"></div>
+                        <div style="position:absolute;left:50px;top:80px;width:2px;height:18px;background:#e22;border-radius:2px;"></div>
+                    </div>
+                `;
+            } else if (animal === 'worm') {
+                html = `
+                    <div style="position:relative;width:100px;height:100px;">
+                        <div style="position:absolute;left:40px;top:60px;width:40px;height:20px;background:${color};border-radius:20px;"></div>
+                        <div style="position:absolute;left:60px;top:65px;width:8px;height:8px;background:#222;border-radius:50%;"></div>
+                    </div>
+                `;
+            } else if (animal === 'lizard') {
+                html = `
+                    <div style="position:relative;width:100px;height:100px;">
+                        <div style="position:absolute;left:35px;top:50px;width:30px;height:18px;background:${color};border-radius:18px 18px 12px 12px/18px 18px 12px 12px;"></div>
+                        <div style="position:absolute;left:60px;top:55px;width:12px;height:12px;background:${color};border-radius:50%;"></div>
+                        <div style="position:absolute;left:65px;top:60px;width:6px;height:6px;background:#222;border-radius:50%;"></div>
+                        <div style="position:absolute;left:40px;top:68px;width:8px;height:18px;background:${color};border-radius:8px;"></div>
+                        <div style="position:absolute;left:57px;top:68px;width:8px;height:18px;background:${color};border-radius:8px;"></div>
+                    </div>
+                `;
+            } else if (animal === 'frog') {
+                html = `
+                    <div style="position:relative;width:100px;height:100px;">
+                        <div style="position:absolute;left:40px;top:60px;width:20px;height:20px;background:${color};border-radius:50%;"></div>
+                        <div style="position:absolute;left:60px;top:60px;width:20px;height:20px;background:${color};border-radius:50%;"></div>
+                        <div style="position:absolute;left:45px;top:65px;width:8px;height:8px;background:#222;border-radius:50%;"></div>
+                        <div style="position:absolute;left:67px;top:65px;width:8px;height:8px;background:#222;border-radius:50%;"></div>
+                        <div style="position:absolute;left:50px;top:80px;width:20px;height:10px;background:#222;border-radius:10px;"></div>
+                    </div>
+                `;
+            }
+            animalPreview.innerHTML = html;
+        }
+        renderAnimalPreview(selectedAnimal, selectedColor);
+
+        animalSelect.addEventListener('change', e => {
+            selectedAnimal = e.target.value;
+            renderAnimalPreview(selectedAnimal, selectedColor);
+        });
+        colorPicker.addEventListener('input', e => {
+            selectedColor = e.target.value;
+            renderAnimalPreview(selectedAnimal, selectedColor);
+        });
+
+        startBtn.addEventListener('click', () => {
+            customMenu.style.display = 'none';
+            // Aplica cor e animal ao jogo
+            document.documentElement.style.setProperty('--cor-cobra-1', selectedColor);
+            window.selectedAnimal = selectedAnimal;
+        });
+
         function draw() {
             gameBoard.innerHTML = '';
-            // Desenha a cobra
             snake.forEach((segment, index) => {
                 const snakeElement = document.createElement('div');
                 snakeElement.style.gridRowStart = segment.y;
                 snakeElement.style.gridColumnStart = segment.x;
-                snakeElement.classList.add('snake');
+
+                // Animal customizado
+                if (window.selectedAnimal === 'worm') {
+                    snakeElement.style.background = selectedColor;
+                    snakeElement.style.borderRadius = '20px';
+                    snakeElement.style.boxShadow = `0 0 8px ${selectedColor}`;
+                } else if (window.selectedAnimal === 'lizard') {
+                    snakeElement.style.background = selectedColor;
+                    snakeElement.style.borderRadius = '40% 40% 30% 30%/40% 40% 30% 30%';
+                    snakeElement.style.boxShadow = `0 0 8px ${selectedColor}`;
+                } else if (window.selectedAnimal === 'frog') {
+                    snakeElement.style.background = selectedColor;
+                    snakeElement.style.borderRadius = '50%';
+                    snakeElement.style.boxShadow = `0 0 8px ${selectedColor}`;
+                } else {
+                    snakeElement.classList.add('snake');
+                }
+
                 if (index === 0) {
                     snakeElement.classList.add('snake-head');
-                    // Adiciona olhos
-                    const leftEye = document.createElement('div');
-                    leftEye.classList.add('eye');
-                    const rightEye = document.createElement('div');
-                    rightEye.classList.add('eye', 'right');
-                    snakeElement.appendChild(leftEye);
-                    snakeElement.appendChild(rightEye);
+                    // Olhos e boca realistas
+                    if (window.selectedAnimal === 'frog') {
+                        const leftEye = document.createElement('div');
+                        leftEye.style.position = 'absolute';
+                        leftEye.style.width = '18%';
+                        leftEye.style.height = '18%';
+                        leftEye.style.background = '#222';
+                        leftEye.style.borderRadius = '50%';
+                        leftEye.style.top = '30%';
+                        leftEye.style.left = '10%';
+                        snakeElement.appendChild(leftEye);
+                        const rightEye = document.createElement('div');
+                        rightEye.style.position = 'absolute';
+                        rightEye.style.width = '18%';
+                        rightEye.style.height = '18%';
+                        rightEye.style.background = '#222';
+                        rightEye.style.borderRadius = '50%';
+                        rightEye.style.top = '30%';
+                        rightEye.style.right = '10%';
+                        snakeElement.appendChild(rightEye);
+                        // Boca
+                        const mouth = document.createElement('div');
+                        mouth.style.position = 'absolute';
+                        mouth.style.width = '40%';
+                        mouth.style.height = '10%';
+                        mouth.style.background = '#222';
+                        mouth.style.borderRadius = '10px';
+                        mouth.style.bottom = '15%';
+                        mouth.style.left = '30%';
+                        snakeElement.appendChild(mouth);
+                    } else if (window.selectedAnimal === 'lizard') {
+                        const leftEye = document.createElement('div');
+                        leftEye.style.position = 'absolute';
+                        leftEye.style.width = '14%';
+                        leftEye.style.height = '14%';
+                        leftEye.style.background = '#222';
+                        leftEye.style.borderRadius = '50%';
+                        leftEye.style.top = '28%';
+                        leftEye.style.left = '18%';
+                        snakeElement.appendChild(leftEye);
+                        const rightEye = document.createElement('div');
+                        rightEye.style.position = 'absolute';
+                        rightEye.style.width = '14%';
+                        rightEye.style.height = '14%';
+                        rightEye.style.background = '#222';
+                        rightEye.style.borderRadius = '50%';
+                        rightEye.style.top = '28%';
+                        rightEye.style.right = '18%';
+                        snakeElement.appendChild(rightEye);
+                    } else if (window.selectedAnimal === 'worm') {
+                        const eye = document.createElement('div');
+                        eye.style.position = 'absolute';
+                        eye.style.width = '14%';
+                        eye.style.height = '14%';
+                        eye.style.background = '#222';
+                        eye.style.borderRadius = '50%';
+                        eye.style.top = '40%';
+                        eye.style.left = '42%';
+                        snakeElement.appendChild(eye);
+                    } else {
+                        // Cobra padrão
+                        const leftEye = document.createElement('div');
+                        leftEye.classList.add('eye');
+                        const rightEye = document.createElement('div');
+                        rightEye.classList.add('eye', 'right');
+                        snakeElement.appendChild(leftEye);
+                        snakeElement.appendChild(rightEye);
+                    }
                 }
                 gameBoard.appendChild(snakeElement);
             });
 
-            // Desenha a comida (maçã)
+            // Comida
             const foodElement = document.createElement('div');
             foodElement.style.gridRowStart = food.y;
             foodElement.style.gridColumnStart = food.x;
             foodElement.classList.add('food');
-            foodElement.innerText = '🍎'; // Usando o emoji da maçã
+            foodElement.innerText = '🍎';
             gameBoard.appendChild(foodElement);
         }
 
@@ -393,6 +616,144 @@
                 }
             }
         }
+
+        // --- PERSONALIZAÇÃO ---
+        const animalSelect = document.getElementById('animal-select');
+        const colorPicker = document.getElementById('color-picker');
+        const animalPreview = document.getElementById('animal-preview');
+        const startBtn = document.getElementById('start-btn');
+
+        // Atualiza o preview do animal com base na seleção
+        function updateAnimalPreview() {
+            const selectedAnimal = animalSelect.value;
+            animalPreview.innerHTML = ''; // Limpa o preview
+
+            let animalElement;
+            switch (selectedAnimal) {
+                case 'snake':
+                    animalElement = document.createElement('div');
+                    animalElement.classList.add('snake');
+                    animalElement.style.width = '100%';
+                    animalElement.style.height = '100%';
+                    animalPreview.appendChild(animalElement);
+
+                    const snakeHead = document.createElement('div');
+                    snakeHead.classList.add('snake-head');
+                    snakeHead.style.width = '100%';
+                    snakeHead.style.height = '100%';
+                    animalElement.appendChild(snakeHead);
+                    break;
+                case 'worm':
+                    animalElement = document.createElement('div');
+                    animalElement.classList.add('worm');
+                    animalElement.style.width = '100%';
+                    animalElement.style.height = '100%';
+                    animalPreview.appendChild(animalElement);
+                    break;
+                case 'lizard':
+                    animalElement = document.createElement('div');
+                    animalElement.classList.add('lizard');
+                    animalElement.style.width = '100%';
+                    animalElement.style.height = '100%';
+                    animalPreview.appendChild(animalElement);
+                    break;
+                case 'frog':
+                    animalElement = document.createElement('div');
+                    animalElement.classList.add('frog');
+                    animalElement.style.width = '100%';
+                    animalElement.style.height = '100%';
+                    animalPreview.appendChild(animalElement);
+                    break;
+            }
+        }
+
+        animalSelect.addEventListener('change', updateAnimalPreview);
+
+        // Atualiza a cor da cobra (animal) com base na seleção de cor
+        colorPicker.addEventListener('input', (e) => {
+            const newColor = e.target.value;
+            document.documentElement.style.setProperty('--cor-cobra-1', newColor);
+            document.documentElement.style.setProperty('--cor-cobra-2', newColor);
+        });
+
+        // Inicia o jogo com as configurações personalizadas
+        startBtn.addEventListener('click', () => {
+            const selectedAnimal = animalSelect.value;
+            const customSnake = [{ x: 11, y: 11 }]; // Posição inicial no centro
+            let customFood = generateFood();
+            let customDirection = { x: 0, y: 0 };
+            let customScore = 0;
+            let customGameRunning = true;
+            let customGameStarted = false;
+            let customGameSpeed = STARTING_SPEED;
+
+            function customMain() {
+                if (!customGameRunning) {
+                    music.pause();
+                    alert(`// SYSTEM FAILURE // SCORE: ${customScore}. PRESS OK TO REBOOT.`);
+                    window.location.reload();
+                    return;
+                }
+                if (aiEnabled) aiMove();
+                customUpdate();
+                customDraw();
+            }
+
+            function customUpdate() {
+                const head = { x: customSnake[0].x + customDirection.x, y: customSnake[0].y + customDirection.y };
+                customSnake.unshift(head);
+
+                if (head.x === customFood.x && head.y === customFood.y) {
+                    customScore++;
+                    scoreDisplay.innerText = customScore;
+                    customFood = generateFood();
+                    if (customGameSpeed > 70) { // Aumenta a velocidade até um limite
+                        customGameSpeed -= 5;
+                        clearInterval(gameInterval);
+                        gameInterval = setInterval(customMain, customGameSpeed);
+                    }
+                } else {
+                    customSnake.pop();
+                }
+
+                if (checkCollision(head)) {
+                    customGameRunning = false;
+                }
+            }
+
+            function customDraw() {
+                gameBoard.innerHTML = '';
+                // Desenha a cobra
+                customSnake.forEach((segment, index) => {
+                    const snakeElement = document.createElement('div');
+                    snakeElement.style.gridRowStart = segment.y;
+                    snakeElement.style.gridColumnStart = segment.x;
+                    snakeElement.classList.add('snake');
+                    if (index === 0) {
+                        snakeElement.classList.add('snake-head');
+                        // Adiciona olhos
+                        const leftEye = document.createElement('div');
+                        leftEye.classList.add('eye');
+                        const rightEye = document.createElement('div');
+                        rightEye.classList.add('eye', 'right');
+                        snakeElement.appendChild(leftEye);
+                        snakeElement.appendChild(rightEye);
+                    }
+                    gameBoard.appendChild(snakeElement);
+                });
+
+                // Desenha a comida (maçã)
+                const foodElement = document.createElement('div');
+                foodElement.style.gridRowStart = customFood.y;
+                foodElement.style.gridColumnStart = customFood.x;
+                foodElement.classList.add('food');
+                foodElement.innerText = '🍎'; // Usando o emoji da maçã
+                gameBoard.appendChild(foodElement);
+            }
+
+            // Inicia o jogo personalizado
+            customMain();
+        });
     </script>
 </body>
 </html>
