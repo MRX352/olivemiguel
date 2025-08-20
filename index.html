@@ -204,6 +204,19 @@
         let food = generateFood();
         let direction = { x: 0, y: 0 };
         let score = 0;
+
+        // Cores para troca automática
+        const snakeColors = [
+            "#adff00", // verde limão
+            "#00f5d4", // verde água
+            "#ff00c1", // rosa neon
+            "#ffe066", // amarelo
+            "#00a878", // verde escuro
+            "#ff595e", // vermelho
+            "#1982c4", // azul
+            "#6a4c93"  // roxo
+        ];
+        let currentColorIndex = 0;
         let gameStarted = false;
         let gameSpeed = STARTING_SPEED;
 
@@ -221,6 +234,13 @@
             if (head.x === food.x && head.y === food.y) {
                 score++;
                 scoreDisplay.innerText = score;
+
+                // Troca de cor a cada 10 pontos
+                if (score % 10 === 0) {
+                    currentColorIndex = (currentColorIndex + 1) % snakeColors.length;
+                    document.documentElement.style.setProperty('--cor-cobra-1', snakeColors[currentColorIndex]);
+                }
+
                 food = generateFood();
                 if (gameSpeed > 70) { // Aumenta a velocidade até um limite
                     gameSpeed -= 5;
@@ -367,24 +387,58 @@
                 { x: 1, y: 0, name: 'right' }
             ];
 
+            // Ordena por distância até a comida
             possibleMoves.sort((a, b) => {
                 const distA = Math.abs((head.x + a.x) - food.x) + Math.abs((head.y + a.y) - food.y);
                 const distB = Math.abs((head.x + b.x) - food.x) + Math.abs((head.y + b.y) - food.y);
                 return distA - distB;
             });
 
+            // Simula cada movimento e escolhe o mais seguro
             for (const move of possibleMoves) {
                 // Evita reversão de direção
                 if ((move.x === -direction.x && move.y === -direction.y)) continue;
                 const nextPos = { x: head.x + move.x, y: head.y + move.y };
+
                 // Verifica se o próximo movimento é seguro
                 if (
                     nextPos.x >= 1 && nextPos.x <= GRID_SIZE &&
                     nextPos.y >= 1 && nextPos.y <= GRID_SIZE &&
                     !snake.some(segment => segment.x === nextPos.x && segment.y === nextPos.y)
                 ) {
+                    // Simula o movimento: verifica se há pelo menos um movimento seguro depois deste
+                    let safeNext = false;
+                    for (const nextMove of possibleMoves) {
+                        if ((nextMove.x === -move.x && nextMove.y === -move.y)) continue;
+                        const futurePos = { x: nextPos.x + nextMove.x, y: nextPos.y + nextMove.y };
+                        if (
+                            futurePos.x >= 1 && futurePos.x <= GRID_SIZE &&
+                            futurePos.y >= 1 && futurePos.y <= GRID_SIZE &&
+                            !snake.some(segment => segment.x === futurePos.x && segment.y === futurePos.y) &&
+                            !(futurePos.x === head.x && futurePos.y === head.y) // não volta pra cabeça
+                        ) {
+                            safeNext = true;
+                            break;
+                        }
+                    }
+                    if (safeNext) {
+                        direction = { x: move.x, y: move.y };
+                        return;
+                    }
+                }
+            }
+
+            // Se não encontrou movimento seguro, faz o primeiro possível (evita travar)
+            for (const move of possibleMoves) {
+                if ((move.x === -direction.x && move.y === -direction.y)) continue;
+                const nextPos = { x: head.x + move.x, y: head.y + move.y };
+                if (
+                    nextPos.x >= 1 && nextPos.x <= GRID_SIZE &&
+                    nextPos.y >= 1 && nextPos.y <= GRID_SIZE &&
+                    !snake.some(segment => segment.x === nextPos.x && segment.y === nextPos.y)
+                ) {
                     direction = { x: move.x, y: move.y };
-                    break;
+                    return;
                 }
             }
         }
