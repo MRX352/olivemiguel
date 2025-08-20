@@ -280,44 +280,9 @@
         let food = generateFood();
         let direction = { x: 0, y: 0 };
         let score = 0;
-        let gameRunning = true;
+        let gameRunning = false; // Só libera após clicar em "Iniciar Jogo"
         let gameStarted = false;
         let gameSpeed = STARTING_SPEED;
-
-        // --- LÓGICA DO JOGO ---
-        function main() {
-            if (!gameRunning) {
-                music.pause();
-                alert(`// SYSTEM FAILURE // SCORE: ${score}. PRESS OK TO REBOOT.`);
-                window.location.reload();
-                return;
-            }
-            if (aiEnabled) aiMove();
-            update();
-            draw();
-        }
-
-        function update() {
-            const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
-            snake.unshift(head);
-
-            if (head.x === food.x && head.y === food.y) {
-                score++;
-                scoreDisplay.innerText = score;
-                food = generateFood();
-                if (gameSpeed > 70) { // Aumenta a velocidade até um limite
-                    gameSpeed -= 5;
-                    clearInterval(gameInterval);
-                    gameInterval = setInterval(main, gameSpeed);
-                }
-            } else {
-                snake.pop();
-            }
-
-            if (checkCollision(head)) {
-                gameRunning = false;
-            }
-        }
 
         // Personalização do animal
         const customMenu = document.getElementById('custom-menu');
@@ -326,10 +291,10 @@
         const colorPicker = document.getElementById('color-picker');
         const animalPreview = document.getElementById('animal-preview');
 
+        // --- PERSONALIZAÇÃO ---
         let selectedAnimal = 'snake';
         let selectedColor = '#adff00';
 
-        // Modelos realistas em SVG/CSS
         function renderAnimalPreview(animal, color) {
             let html = '';
             if (animal === 'snake') {
@@ -382,12 +347,52 @@
             renderAnimalPreview(selectedAnimal, selectedColor);
         });
 
+        // Só inicia o jogo após clicar em "Iniciar Jogo"
+        customMenu.style.display = 'flex';
         startBtn.addEventListener('click', () => {
             customMenu.style.display = 'none';
-            // Aplica cor e animal ao jogo
             document.documentElement.style.setProperty('--cor-cobra-1', selectedColor);
             window.selectedAnimal = selectedAnimal;
+            gameRunning = true; // Libera o jogo
         });
+
+        // --- LÓGICA DO JOGO ---
+        function main() {
+            if (!gameRunning) return;
+            if (!gameStarted) {
+                music.volume = 0.5;
+                music.play().catch(e => {});
+                gameStarted = true;
+            }
+            if (aiEnabled) aiMove();
+            update();
+            draw();
+        }
+
+        function update() {
+            const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+            snake.unshift(head);
+
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                scoreDisplay.innerText = score;
+                food = generateFood();
+                if (gameSpeed > 70) { // Aumenta a velocidade até um limite
+                    gameSpeed -= 5;
+                    clearInterval(gameInterval);
+                    gameInterval = setInterval(main, gameSpeed);
+                }
+            } else {
+                snake.pop();
+            }
+
+            if (checkCollision(head)) {
+                gameRunning = false;
+                music.pause();
+                alert(`// SYSTEM FAILURE // SCORE: ${score}. PRESS OK TO REBOOT.`);
+                window.location.reload();
+            }
+        }
 
         function draw() {
             gameBoard.innerHTML = '';
@@ -521,14 +526,13 @@
         function startGame() {
             if (!gameStarted) {
                 music.volume = 0.5; // Música um pouco mais baixa
-                music.play().catch(e => console.log("Aguardando interação do usuário para tocar a música."));
+                music.play().catch(e => {});
                 gameStarted = true;
             }
         }
         
         window.addEventListener('keydown', e => {
             if (!gameStarted) startGame();
-            
             switch (e.key) {
                 case 'ArrowUp': if (direction.y === 0) direction = { x: 0, y: -1 }; break;
                 case 'ArrowDown': if (direction.y === 0) direction = { x: 0, y: 1 }; break;
@@ -594,7 +598,6 @@
                 { x: 1, y: 0, name: 'right' }
             ];
 
-            // Prioriza movimentos que aproximam da comida
             possibleMoves.sort((a, b) => {
                 const distA = Math.abs((head.x + a.x) - food.x) + Math.abs((head.y + a.y) - food.y);
                 const distB = Math.abs((head.x + b.x) - food.x) + Math.abs((head.y + b.y) - food.y);
@@ -616,144 +619,6 @@
                 }
             }
         }
-
-        // --- PERSONALIZAÇÃO ---
-        const animalSelect = document.getElementById('animal-select');
-        const colorPicker = document.getElementById('color-picker');
-        const animalPreview = document.getElementById('animal-preview');
-        const startBtn = document.getElementById('start-btn');
-
-        // Atualiza o preview do animal com base na seleção
-        function updateAnimalPreview() {
-            const selectedAnimal = animalSelect.value;
-            animalPreview.innerHTML = ''; // Limpa o preview
-
-            let animalElement;
-            switch (selectedAnimal) {
-                case 'snake':
-                    animalElement = document.createElement('div');
-                    animalElement.classList.add('snake');
-                    animalElement.style.width = '100%';
-                    animalElement.style.height = '100%';
-                    animalPreview.appendChild(animalElement);
-
-                    const snakeHead = document.createElement('div');
-                    snakeHead.classList.add('snake-head');
-                    snakeHead.style.width = '100%';
-                    snakeHead.style.height = '100%';
-                    animalElement.appendChild(snakeHead);
-                    break;
-                case 'worm':
-                    animalElement = document.createElement('div');
-                    animalElement.classList.add('worm');
-                    animalElement.style.width = '100%';
-                    animalElement.style.height = '100%';
-                    animalPreview.appendChild(animalElement);
-                    break;
-                case 'lizard':
-                    animalElement = document.createElement('div');
-                    animalElement.classList.add('lizard');
-                    animalElement.style.width = '100%';
-                    animalElement.style.height = '100%';
-                    animalPreview.appendChild(animalElement);
-                    break;
-                case 'frog':
-                    animalElement = document.createElement('div');
-                    animalElement.classList.add('frog');
-                    animalElement.style.width = '100%';
-                    animalElement.style.height = '100%';
-                    animalPreview.appendChild(animalElement);
-                    break;
-            }
-        }
-
-        animalSelect.addEventListener('change', updateAnimalPreview);
-
-        // Atualiza a cor da cobra (animal) com base na seleção de cor
-        colorPicker.addEventListener('input', (e) => {
-            const newColor = e.target.value;
-            document.documentElement.style.setProperty('--cor-cobra-1', newColor);
-            document.documentElement.style.setProperty('--cor-cobra-2', newColor);
-        });
-
-        // Inicia o jogo com as configurações personalizadas
-        startBtn.addEventListener('click', () => {
-            const selectedAnimal = animalSelect.value;
-            const customSnake = [{ x: 11, y: 11 }]; // Posição inicial no centro
-            let customFood = generateFood();
-            let customDirection = { x: 0, y: 0 };
-            let customScore = 0;
-            let customGameRunning = true;
-            let customGameStarted = false;
-            let customGameSpeed = STARTING_SPEED;
-
-            function customMain() {
-                if (!customGameRunning) {
-                    music.pause();
-                    alert(`// SYSTEM FAILURE // SCORE: ${customScore}. PRESS OK TO REBOOT.`);
-                    window.location.reload();
-                    return;
-                }
-                if (aiEnabled) aiMove();
-                customUpdate();
-                customDraw();
-            }
-
-            function customUpdate() {
-                const head = { x: customSnake[0].x + customDirection.x, y: customSnake[0].y + customDirection.y };
-                customSnake.unshift(head);
-
-                if (head.x === customFood.x && head.y === customFood.y) {
-                    customScore++;
-                    scoreDisplay.innerText = customScore;
-                    customFood = generateFood();
-                    if (customGameSpeed > 70) { // Aumenta a velocidade até um limite
-                        customGameSpeed -= 5;
-                        clearInterval(gameInterval);
-                        gameInterval = setInterval(customMain, customGameSpeed);
-                    }
-                } else {
-                    customSnake.pop();
-                }
-
-                if (checkCollision(head)) {
-                    customGameRunning = false;
-                }
-            }
-
-            function customDraw() {
-                gameBoard.innerHTML = '';
-                // Desenha a cobra
-                customSnake.forEach((segment, index) => {
-                    const snakeElement = document.createElement('div');
-                    snakeElement.style.gridRowStart = segment.y;
-                    snakeElement.style.gridColumnStart = segment.x;
-                    snakeElement.classList.add('snake');
-                    if (index === 0) {
-                        snakeElement.classList.add('snake-head');
-                        // Adiciona olhos
-                        const leftEye = document.createElement('div');
-                        leftEye.classList.add('eye');
-                        const rightEye = document.createElement('div');
-                        rightEye.classList.add('eye', 'right');
-                        snakeElement.appendChild(leftEye);
-                        snakeElement.appendChild(rightEye);
-                    }
-                    gameBoard.appendChild(snakeElement);
-                });
-
-                // Desenha a comida (maçã)
-                const foodElement = document.createElement('div');
-                foodElement.style.gridRowStart = customFood.y;
-                foodElement.style.gridColumnStart = customFood.x;
-                foodElement.classList.add('food');
-                foodElement.innerText = '🍎'; // Usando o emoji da maçã
-                gameBoard.appendChild(foodElement);
-            }
-
-            // Inicia o jogo personalizado
-            customMain();
-        });
     </script>
 </body>
 </html>
