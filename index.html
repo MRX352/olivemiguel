@@ -209,6 +209,7 @@
 
         // --- LÓGICA DO JOGO ---
         function main() {
+            if (aiEnabled) aiMove(); // Chama IA se ativada
             update();
             draw();
         }
