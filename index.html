@@ -87,8 +87,8 @@
 
         .snake {
             /* Efeito de volume com gradiente radial */
-            background: radial-gradient(circle at 60% 40%, #adff00 60%, #00a878 100%);
-            box-shadow: 0 0 12px #adff00, 0 0 2px #00a878 inset;
+            background: radial-gradient(circle at 60% 40%, var(--cor-cobra-1) 60%, var(--cor-cobra-2) 100%);
+            box-shadow: 0 0 12px var(--cor-cobra-1), 0 0 2px var(--cor-cobra-2) inset;
             border-radius: 50%;
             position: relative;
             z-index: 1;
@@ -96,9 +96,9 @@
         }
 
         .snake-head {
-            background: radial-gradient(circle at 60% 40%, #eaff7b 70%, #adff00 100%);
+            background: radial-gradient(circle at 60% 40%, #eaff7b 70%, var(--cor-cobra-1) 100%);
             border-radius: 50%;
-            box-shadow: 0 0 18px #eaff7b, 0 0 4px #adff00 inset;
+            box-shadow: 0 0 18px #eaff7b, 0 0 4px var(--cor-cobra-1) inset;
             position: relative;
             z-index: 2;
         }
@@ -207,14 +207,14 @@
 
         // Cores para troca automática
         const snakeColors = [
-            "#adff00", // verde limão
-            "#00f5d4", // verde água
-            "#ff00c1", // rosa neon
-            "#ffe066", // amarelo
-            "#00a878", // verde escuro
-            "#ff595e", // vermelho
-            "#1982c4", // azul
-            "#6a4c93"  // roxo
+            ["#adff00", "#00a878"], // verde limão + verde escuro
+            ["#00f5d4", "#1982c4"], // verde água + azul
+            ["#ff00c1", "#6a4c93"], // rosa neon + roxo
+            ["#ffe066", "#ff595e"], // amarelo + vermelho
+            ["#00a878", "#adff00"], // verde escuro + verde limão
+            ["#ff595e", "#ffe066"], // vermelho + amarelo
+            ["#1982c4", "#00f5d4"], // azul + verde água
+            ["#6a4c93", "#ff00c1"]  // roxo + rosa neon
         ];
         let currentColorIndex = 0;
         let gameStarted = false;
@@ -238,7 +238,8 @@
                 // Troca de cor a cada 10 pontos
                 if (score % 10 === 0) {
                     currentColorIndex = (currentColorIndex + 1) % snakeColors.length;
-                    document.documentElement.style.setProperty('--cor-cobra-1', snakeColors[currentColorIndex]);
+                    document.documentElement.style.setProperty('--cor-cobra-1', snakeColors[currentColorIndex][0]);
+                    document.documentElement.style.setProperty('--cor-cobra-2', snakeColors[currentColorIndex][1]);
                 }
 
                 food = generateFood();
